@@ -1,7 +1,24 @@
 #include<gtk/gtk.h>
 
+
+GdkPixbuf *create_pixbuf(const gchar * filename) {
+    
+   GdkPixbuf *pixbuf;
+   GError *error = NULL;
+   pixbuf = gdk_pixbuf_new_from_file(filename, &error);
+   
+   if (!pixbuf) {
+       
+      fprintf(stderr, "Printing here: %s\n", error->message);
+      g_error_free(error);
+   }
+
+   return pixbuf;
+}
+
 int main(int argc, char *argv[]){
     GtkWidget *window;
+    GdkPixbuf *icon;
 
     gtk_init(&argc, &argv);
 
@@ -9,9 +26,15 @@ int main(int argc, char *argv[]){
     gtk_window_set_title(GTK_WINDOW(window), "Center");
     gtk_window_set_default_size(GTK_WINDOW(window), 230, 150);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+
+    icon = create_pixbuf("web.png");  
+    gtk_window_set_icon(GTK_WINDOW(window), icon);
+
     gtk_widget_show(window);
 
-    g_signal_connect(window, "distroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+    g_object_unref(icon);
 
     gtk_main();
     return 0;
