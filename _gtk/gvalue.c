@@ -18,7 +18,7 @@ int main(){
 
     if(G_VALUE_HOLDS(&value, G_TYPE_STRING)){
         g_print("True\n");
-        g_object_set_property(button, "label", &value);
+        g_object_set_property(G_OBJECT(button), "label", &value);
     }
 
     gtk_widget_show_all(window);
