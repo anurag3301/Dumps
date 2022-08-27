@@ -1,28 +1,29 @@
 #include <iostream>
 #include <ncurses.h>
+#include "player.h"
 using namespace std;
 
 int main(){
     initscr();
     cbreak();
     noecho();
-    int height, width, start_y, start_x;
+    curs_set(0);
 
-    height = 10;
-    width = 20;
-    start_y = start_x = 10;
+    int yMax, xMax;
+    getmaxyx(stdscr, yMax, xMax);
 
-    WINDOW *win = newwin(height, width, start_y, start_x);
-    refresh();
-
+    WINDOW *win = newwin(20, 70, (yMax/2)-10, (xMax/2)-35);
     box(win, 0, 0);
-    attron(A_BOLD);
-    mvwprintw(win, 1, 1, "This is in the box");
-    attroff(A_BOLD);
+    refresh();
     wrefresh(win);
 
-    int c = getch();
-    endwin();
+    Player *p = new Player(win, 1, 1, '@');
+    do{
+        p->display();
+        wrefresh(win);
+    }while(p->getmv() != 'x');
 
+    getch();
+    endwin();
     return 0;
 }
