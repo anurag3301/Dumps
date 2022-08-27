@@ -16,7 +16,9 @@ int main(){
     refresh();
 
     box(win, 0, 0);
+    attron(A_BOLD);
     mvwprintw(win, 1, 1, "This is in the box");
+    attroff(A_BOLD);
     wrefresh(win);
 
     int c = getch();
