@@ -25,13 +25,20 @@ Table* init_table(char* file_name){
         return NULL;
     }
 
-    Table* table = malloc(sizeof(table));
+    Table* table = malloc(sizeof(Table));
 
     getline(&line, &len, f);
-    uint comma_numer = 0;
-    for(int i=0; line[i]!='\0'; i++)if(line[i]==',')comma_numer++;
-    printf("%d", comma_numer);
+    size_t comma_count = 0;
+    for(int i=0; line[i]!='\0'; i++)if(line[i]==',')comma_count++;
+    table->col_count = ++comma_count;
+
+    rewind(f);
+    size_t line_count = 0;
+    while(getline(&line, &len, f) != -1)line_count++;
+    table->row_count = line_count;
     
+    rewind(f);
+    getline(&line, &len, f);
     free(line);
     return table;
 }
