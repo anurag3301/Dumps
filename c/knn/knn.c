@@ -66,6 +66,7 @@ Table* init_table(char* file_name){
     
     rewind(f);
     getline(&line, &len, f);
+    line[strlen(line)-2] = '\0';
     char** col_names = parse_row(line, table->col_count);
     table->col_names = col_names;
     for(int i=0; i<table->col_count; i++){
@@ -106,9 +107,22 @@ void distroy_table(Table* table){
     free(table);
 }
 
+void print_table(Table* table){
+    for(size_t i=0; i<table->col_count; i++){
+        printf("%s\t", table->col_names[i]);
+    }
+    for(size_t row=0; row<table->row_count; row++){
+        printf("\n");
+        for(size_t col=0; col<table->col_count; col++){
+            printf("%s\t", table->cols[col].colvals[row]);
+        }
+    }
+    printf("\n");
+}
 
 int main(){
     Table* table = init_table("iris.csv");
-    /* char** res = parse_row("hel,my,name,is,asdf", 5); */
+    /* Table* table = init_table("iris_full.csv"); */
+    print_table(table);
     distroy_table(table);
 }
