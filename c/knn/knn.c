@@ -58,7 +58,7 @@ Table* init_table(char* file_name){
     rewind(f);
     size_t line_count = 0;
     while(getline(&line, &len, f) != -1)line_count++;
-    table->row_count = line_count;
+    table->row_count = --line_count;
     for(size_t i=0; i<table->col_count; i++){
         table->cols[i].colvals = malloc(sizeof(char*)*table->row_count);
         table->cols[i].row_count = table->row_count;
@@ -72,12 +72,30 @@ Table* init_table(char* file_name){
         table->cols[i].colname = table->col_names[i];
     }
 
+
+    rewind(f);
+    getline(&line, &len, f);
+    for(size_t line_no=0; getline(&line, &len, f) != -1; line_no++){
+        line[strlen(line)-2] = '\0';
+        char** res = parse_row(line, table->col_count);
+        for(size_t i=0; i<table->col_count; i++){
+            table->cols[i].colvals[line_no] = res[i];
+        }
+        free(res);
+    }
+
+
     free(line);
     fclose(f);
     return table;
 }
 
 void distroy_table(Table* table){
+    for(size_t row=0; row<table->row_count; row++){
+        for(size_t col=0; col<table->col_count; col++){
+            free(table->cols[col].colvals[row]);
+        }
+    }
     for(size_t i=0; i<table->col_count; i++){
         free(table->col_names[i]);
         free(table->cols[i].colvals);
@@ -87,7 +105,6 @@ void distroy_table(Table* table){
 
     free(table);
 }
-
 
 
 int main(){
