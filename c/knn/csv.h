@@ -34,4 +34,6 @@ Column* const get_col(char* col_name, Table* table);
 Row* const get_row(size_t rowno, Table* table);
 void distroy_row(Row* row);
 
+void add_row(char** row_vals, Table* table);
+
 void print_table(Table* table);

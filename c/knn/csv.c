@@ -119,6 +119,21 @@ Row* const get_row(size_t rowno, Table* table){
     return row;
 }
 
+void add_row(char** row_vals, Table* table){
+    if(table->max_size == table->row_count){
+        table->max_size *= 2;
+        for(size_t i=0; i<table->col_count; i++){
+            table->cols[i].colvals = realloc(table->cols[i].colvals, sizeof(char*) * table->max_size);
+            table->cols[i].max_size = table->max_size;
+        }
+    }
+    for(size_t i=0; i<table->col_count; i++){
+        table->cols[i].colvals[table->row_count] = strdup(row_vals[i]);
+        table->cols[i].row_count++;
+    }
+    table->row_count++;
+}
+
 void distroy_row(Row* row){
     free(row->row_vals);
     free(row);
