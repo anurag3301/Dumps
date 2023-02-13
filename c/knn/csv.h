@@ -4,12 +4,15 @@ typedef struct Column{
     char* colname;
     char** colvals;
     size_t row_count;
+    size_t max_size;
 }Column;
 
 typedef struct Table{
     Column *cols;
-    size_t row_count, col_count;
     char** col_names;
+    size_t row_count;
+    size_t col_count;
+    size_t max_size;
 }Table;
 
 char* substr(char* raw_str, size_t idx, size_t len);
