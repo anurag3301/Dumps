@@ -48,7 +48,7 @@ Table* init_table(char* file_name){
     size_t line_count = 0;
     while(getline(&line, &len, f) != -1)line_count++;
     table->row_count = --line_count;
-    table->max_size = pow(ceil(sqrt(table->row_count)), 2);
+    table->max_size = pow(2, ceil(log2(table->row_count)));
     for(size_t i=0; i<table->col_count; i++){
         table->cols[i].colvals = malloc(sizeof(char*)*table->max_size);
         table->cols[i].row_count = table->row_count;
