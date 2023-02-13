@@ -97,6 +97,15 @@ void distroy_table(Table* table){
     free(table);
 }
 
+Column* const get_col(char* col_name, Table* table){
+    for(int i=0; i<table->col_count; i++){
+        if(strcmp(col_name, table->col_names[i]) == 0){
+            return &table->cols[i];
+        }
+    }
+    return NULL;
+}
+
 void print_table(Table* table){
     for(size_t i=0; i<table->col_count; i++){
         printf("%s\t", table->col_names[i]);

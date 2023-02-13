@@ -23,4 +23,6 @@ Table* init_table(char* file_name);
 
 void distroy_table(Table* table);
 
+Column* const get_col(char* col_name, Table* table);
+
 void print_table(Table* table);
