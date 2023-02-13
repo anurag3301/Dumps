@@ -106,6 +106,24 @@ Column* const get_col(char* col_name, Table* table){
     return NULL;
 }
 
+
+Row* const get_row(size_t rowno, Table* table){
+    Row* row = malloc(sizeof(Row));
+    row->col_count = table->col_count;
+    row->col_names = table->col_names;
+    row->row_vals = malloc(sizeof(char*) * table->col_count);
+    if(rowno >= table->row_count) return NULL;
+    for(size_t i=0; i<table->col_count; i++){
+        row->row_vals[i] = table->cols[i].colvals[rowno];
+    }
+    return row;
+}
+
+void distroy_row(Row* row){
+    free(row->row_vals);
+    free(row);
+}
+
 void print_table(Table* table){
     for(size_t i=0; i<table->col_count; i++){
         printf("%s\t", table->col_names[i]);
