@@ -132,6 +132,24 @@ void add_row(char** row_vals, Table* table){
     table->row_count++;
 }
 
+
+void add_col(char* col_name, char** col_vals, Table* table){
+    table->col_count++;
+    table->col_names = realloc(table->col_names, sizeof(char*) * table->col_count);
+    table->cols = realloc(table->cols, sizeof(Column) * table->col_count);
+    table->col_names[table->col_count-1] = strdup(col_name);
+
+    Column* new_col = &table->cols[table->col_count-1];
+    new_col->colname = table->col_names[table->col_count-1];
+    new_col->row_count = table->row_count;
+    new_col->max_size = table->max_size;
+    new_col->colvals = malloc(sizeof(char*) * new_col->max_size);
+    for(size_t i=0; i<new_col->row_count; i++){
+        new_col->colvals[i] = strdup(col_vals[i]);
+    }
+
+}
+
 void distroy_row(Row* row){
     free(row->row_vals);
     free(row);
