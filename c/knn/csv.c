@@ -199,8 +199,13 @@ Table* copy_table(Table* table){
     return new;
 }
 
-
-
+void cell_update(Table* table, char* col_name, size_t row, char* new_val){
+    Column* col = get_col(col_name, table);
+    if(col == NULL)return;
+    if(row >= col->row_count)return;
+    free(col->colvals[row]);
+    col->colvals[row] = strdup(new_val); 
+}
 
 
 

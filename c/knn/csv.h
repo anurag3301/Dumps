@@ -43,3 +43,5 @@ char* const get_row_val(Row* row, char* col_name, int to_free);
 void print_table(Table* table);
 
 Table* copy_table(Table* table);
+
+void cell_update(Table* table, char* col_name, size_t row, char* new_val);

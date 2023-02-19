@@ -4,10 +4,9 @@
 
 int main(){
     Table* table = init_table("username.csv");
-    Table* new = copy_table(table);
         
-    print_table(new);
+    cell_update(table, "Identifier", 0, "hello"); 
+    print_table(table);
 
     distroy_table(table);
-    distroy_table(new);
 }
