@@ -1,14 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "csv.h"
 
 int main(){
     Table* table = init_table("username.csv");
 
-    char* dat = get_col_val(get_col("Identifier", table), 0);
+    Row* row = get_row(3, table);
+    char* dat = get_row_val(row, "Identifier", 0);
     printf("%s\n", dat);
+    distroy_row(row);
 
-    print_table(table);
-    printf("%zu\n", table->max_size);
+    dat = get_row_val(get_row(3, table), "Identifier", 1);
+    printf("%s\n", dat);
+    free(dat);
 
     distroy_table(table);
 }

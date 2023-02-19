@@ -143,6 +143,23 @@ char* const get_col_val(Column* col, size_t idx){
     return col->colvals[idx];
 }
 
+char* const get_row_val(Row* row, char* col_name, int to_free){
+    if(row == NULL) return NULL;
+    for(size_t i=0; i<row->col_count; i++){
+        if(strcmp(col_name, row->col_names[i]) == 0){
+            char* result;
+            if(to_free){
+                result = strdup(row->row_vals[i]);
+                distroy_row(row);
+            }else{
+                result = row->row_vals[i];
+            }
+            return result;
+        }
+    }
+    return NULL;
+}
+
 void print_table(Table* table){
     for(size_t i=0; i<table->col_count; i++){
         printf("%s,\t", table->col_names[i]);

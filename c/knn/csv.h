@@ -38,4 +38,6 @@ void add_row(char** row_vals, Table* table);
 
 char* const get_col_val(Column* col, size_t idx);
 
+char* const get_row_val(Row* row, char* col_name, int to_free);
+
 void print_table(Table* table);
