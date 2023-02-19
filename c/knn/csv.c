@@ -137,6 +137,12 @@ void distroy_row(Row* row){
     free(row);
 }
 
+char* const get_col_val(Column* col, size_t idx){
+    if(col == NULL) return NULL;
+    if(idx >= col->row_count) return NULL;
+    return col->colvals[idx];
+}
+
 void print_table(Table* table){
     for(size_t i=0; i<table->col_count; i++){
         printf("%s,\t", table->col_names[i]);
