@@ -161,6 +161,7 @@ char* const get_row_val(Row* row, char* col_name, int to_free){
 }
 
 void print_table(Table* table){
+    printf("\nNumber of rows: %zu and Number of cols: %zu\n\n", table->row_count, table->col_count);
     for(size_t i=0; i<table->col_count; i++){
         printf("%s,\t", table->col_names[i]);
     }
@@ -172,3 +173,37 @@ void print_table(Table* table){
     }
     printf("\n");
 }
+
+Table* copy_table(Table* table){
+    Table* new = malloc(sizeof(Table));
+    new->col_count = table->col_count;
+    new->row_count = table->row_count;
+    new->max_size = table->max_size;
+
+    new->cols = malloc(sizeof(Column) * new->col_count);
+
+    new->col_names = malloc(sizeof(char*) * new->col_count);
+    for(size_t i=0; i<new->col_count; i++){
+        new->cols[i].row_count = new->row_count;
+        new->cols[i].max_size = new->max_size;
+
+        new->col_names[i] = strdup(table->col_names[i]);
+        new->cols[i].colname = new->col_names[i];
+
+        new->cols[i].colvals = malloc(sizeof(char*) * new->max_size);
+        for(size_t j=0; j<new->row_count; j++){
+            new->cols[i].colvals[j] = strdup(table->cols[i].colvals[j]);
+        }
+    }
+
+    return new;
+}
+
+
+
+
+
+
+
+
+

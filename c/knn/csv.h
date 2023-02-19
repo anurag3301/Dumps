@@ -41,3 +41,5 @@ char* const get_col_val(Column* col, size_t idx);
 char* const get_row_val(Row* row, char* col_name, int to_free);
 
 void print_table(Table* table);
+
+Table* copy_table(Table* table);
