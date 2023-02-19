@@ -226,7 +226,21 @@ void cell_update(Table* table, char* col_name, size_t row, char* new_val){
 }
 
 
+void delete_row(size_t row, Table* table){
+    if(row >= table->row_count)return;
 
+    for(size_t i=0; i<table->col_count; i++){
+        free(table->cols[i].colvals[row]);
+    }
+
+    for(size_t i=0; i<table->col_count; i++){
+        for(size_t j=row; j<table->row_count-1; j++){
+            table->cols[i].colvals[j] = table->cols[i].colvals[j+1];
+        }
+        table->cols[i].row_count--;
+    }
+    table->row_count--;
+}
 
 
 
