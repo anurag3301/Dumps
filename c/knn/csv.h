@@ -48,3 +48,4 @@ Table* copy_table(Table* table);
 void cell_update(Table* table, char* col_name, size_t row, char* new_val);
 
 void delete_row(size_t row, Table* table);
+void delete_col(char* col_name, Table* table);

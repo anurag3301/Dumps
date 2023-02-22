@@ -243,4 +243,25 @@ void delete_row(size_t row, Table* table){
 }
 
 
+void delete_col(char* col_name, Table* table){
+    size_t col_idx;
+    for(col_idx=0; col_idx<table->col_count &&
+            strcmp(table->col_names[col_idx], col_name) != 0; col_idx++);
 
+    Column col = table->cols[col_idx];
+    for(size_t i=0; i<table->row_count; i++){
+        free(col.colvals[i]);
+    }
+    free(col.colvals);
+    free(table->col_names[col_idx]);
+
+    for(size_t i=col_idx; i<table->col_count-1; i++){
+        table->col_names[i] = table->col_names[i+1];
+        table->cols[i] = table->cols[i+1];
+    }
+
+
+    table->col_count--;
+    table->col_names = realloc(table->col_names, sizeof(char*) * table->col_count);
+    table->cols = realloc(table->cols, sizeof(Column) * table->col_count);
+}
