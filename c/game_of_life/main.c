@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <wchar.h>
 #include <locale.h>
+#include <time.h>
 
 WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);
@@ -38,9 +39,43 @@ void draw_matrix(char** mat, int size, int startx, int starty){
     }
 }
 
+int calc_neighbour(char** mat, int size, int row, int col){
+    int count = 0;
+
+    if(row > 0 && col > 0) count += mat[row-1][col-1];
+    if(row > 0) count += mat[row-1][col];
+    if(row > 0 && col < size-1) count += mat[row-1][col+1];
+
+    if(col > 0) count += mat[row][col-1];
+    if(col < size-1) count += mat[row][col+1];
+
+    if(row < size-1 && col > 0) count += mat[row+1][col-1];
+    if(row < size-1) count += mat[row+1][col];
+    if(row < size-1 && col < size-1) count += mat[row+1][col+1];
+    return count;
+}
+
+char** next_move(char** mat, int size){
+    char** temp = create_matrix(size, 0);
+    for(int i=0; i<size; i++){
+    for(int j=0; j<size; j++){
+        int neighbour = calc_neighbour(mat, size-1, i, j);
+        if(mat[i][j] && (neighbour == 2 || neighbour == 3)){
+            temp[i][j] = 1;
+        }
+        else if(!mat[i][j] && neighbour == 3){
+            temp[i][j] = 1;
+        }
+    }
+    }
+    destroy_matrix(mat, size);
+    return temp;
+}
+
 
 int main(int argc, char *argv[]){	
     setlocale(LC_ALL, "");
+    srand ( time(NULL) );
     WINDOW *my_win;
 	int startx, starty, width, height;
 	int ch;
@@ -58,15 +93,15 @@ int main(int argc, char *argv[]){
 	refresh();
     my_win = create_newwin(height, width, starty, startx);
 
-    char** matrix = create_matrix(height, 100);
+    char** matrix = create_matrix(height, 50);
     draw_matrix(matrix, height, startx, starty);
     while(true){
-        matrix = create_matrix(height, 7);
+        matrix = next_move(matrix, height);
         draw_matrix(matrix, height, startx, starty);
-        destroy_matrix(matrix, height);
         refresh();
-        delay_output(1);
+        delay_output(50);
     }
+    destroy_matrix(matrix, height);
 
 	endwin();
 	return 0;
