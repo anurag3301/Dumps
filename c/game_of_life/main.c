@@ -60,10 +60,14 @@ int main(int argc, char *argv[]){
 
     char** matrix = create_matrix(height, 100);
     draw_matrix(matrix, height, startx, starty);
-    destroy_matrix(matrix, height);
+    while(true){
+        matrix = create_matrix(height, 7);
+        draw_matrix(matrix, height, startx, starty);
+        destroy_matrix(matrix, height);
+        refresh();
+        delay_output(1);
+    }
 
-
-    getch();
 	endwin();
 	return 0;
 }
