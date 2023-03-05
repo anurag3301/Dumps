@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
+#include <wchar.h>
+#include <locale.h>
 
 WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);
@@ -23,7 +25,22 @@ void destroy_matrix(char** mat, int size){
     }
     free(mat);
 }
+
+void draw_matrix(char** mat, int size, int startx, int starty){
+    for(int i=0; i<size-2; i++){
+        for(int j=0; j<size-1; j++){
+            char state = mat[i][j];
+            if(state)
+                mvprintw(starty+1+i, startx+1+j*2, "%ls", L"██");
+            else
+                mvprintw(starty+1+i, startx+1+j*2, "%ls", L"  ");
+        }
+    }
+}
+
+
 int main(int argc, char *argv[]){	
+    setlocale(LC_ALL, "");
     WINDOW *my_win;
 	int startx, starty, width, height;
 	int ch;
@@ -42,6 +59,7 @@ int main(int argc, char *argv[]){
     my_win = create_newwin(height, width, starty, startx);
 
     char** matrix = create_matrix(height, 100);
+    draw_matrix(matrix, height, startx, starty);
     destroy_matrix(matrix, height);
 
 
