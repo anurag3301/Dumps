@@ -9,6 +9,7 @@ WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);
 
 char** create_matrix(int size, int prob){
+    size -= 2;
     char** matrix = malloc(sizeof(char*) * size);
     for(size_t i=0; i<size; i++){
         matrix[i] = malloc(sizeof(char) * size);
@@ -21,6 +22,7 @@ char** create_matrix(int size, int prob){
 }
 
 void destroy_matrix(char** mat, int size){
+    size -= 2;
     for(size_t i=0; i<size; i++){
         free(mat[i]);
     }
@@ -28,13 +30,14 @@ void destroy_matrix(char** mat, int size){
 }
 
 void draw_matrix(char** mat, int size, int startx, int starty){
-    for(int i=0; i<size-2; i++){
-        for(int j=0; j<size-1; j++){
+    size -= 2;
+    for(int i=0; i<size; i++){
+        for(int j=0; j<size; j++){
             char state = mat[i][j];
             if(state)
-                mvprintw(starty+1+i, startx+1+j*2, "%ls", L"██");
+                mvprintw(starty+1+i, startx+2+j*2, "%ls", L"██");
             else
-                mvprintw(starty+1+i, startx+1+j*2, "%ls", L"  ");
+                mvprintw(starty+1+i, startx+2+j*2, "%ls", L"  ");
         }
     }
 }
@@ -57,9 +60,10 @@ int calc_neighbour(char** mat, int size, int row, int col){
 
 char** next_move(char** mat, int size){
     char** temp = create_matrix(size, 0);
+    size -= 2;
     for(int i=0; i<size; i++){
     for(int j=0; j<size; j++){
-        int neighbour = calc_neighbour(mat, size-1, i, j);
+        int neighbour = calc_neighbour(mat, size, i, j);
         if(mat[i][j] && (neighbour == 2 || neighbour == 3)){
             temp[i][j] = 1;
         }
@@ -95,13 +99,18 @@ int main(int argc, char *argv[]){
 
     char** matrix = create_matrix(height, 50);
     draw_matrix(matrix, height, startx, starty);
+    /* mvgetch(0, 0); */
+    int gen = 0;
     while(true){
         matrix = next_move(matrix, height);
+        mvprintw(starty-2, startx+(height)-7, "Generation: %d", gen++);
         draw_matrix(matrix, height, startx, starty);
         refresh();
+        /* mvgetch(0, 0); */
         delay_output(50);
     }
     destroy_matrix(matrix, height);
+    getch();
 
 	endwin();
 	return 0;
