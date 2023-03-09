@@ -104,12 +104,12 @@ int main(int argc, char *argv[]){
 
     char** matrix = create_matrix(height, 50);
     draw_matrix(matrix, height, startx+1, starty);
-    /* mvgetch(0, 0); */
+    mvgetch(0, 0);
     int gen = 0;
     while(true){
         matrix = next_move(matrix, height);
-        mvprintw(starty, startx+(height)-7, "Generation: %d", gen++);
-        draw_matrix(matrix, height, startx, starty);
+        mvprintw(starty-1, startx+(height)-7, "Generation: %d", gen++);
+        draw_matrix(matrix, height, startx+1, starty);
         refresh();
         mvgetch(0, 0);
         /* delay_output(50); */
