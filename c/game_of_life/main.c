@@ -5,8 +5,15 @@
 #include <locale.h>
 #include <time.h>
 
-WINDOW *create_newwin(int height, int width, int starty, int startx);
-void destroy_win(WINDOW *local_win);
+WINDOW *create_newwin(int height, int width, int starty, int startx){
+   WINDOW *local_win;
+   
+   local_win = newwin(height, width, starty, startx);
+   box(local_win, 0 , 0);
+   wrefresh(local_win);
+   
+   return local_win;
+}
 
 char** create_matrix(int size, int prob){
     size = (size-2) * 2;
@@ -84,59 +91,50 @@ char** next_move(char** mat, int size){
 
 int main(int argc, char *argv[]){	
     setlocale(LC_ALL, "");
-    srand ( time(NULL) );
-    WINDOW *my_win;
-	int startx, starty, width, height;
-	int ch;
+    srand (time(NULL));
+    WINDOW *game_box;
+	int startx, starty, width, height, gen = 0;
+    char opt;
+    char** matrix;
 
 	initscr();
 	cbreak();
 	keypad(stdscr, TRUE);
+    curs_set(0);
 
 	height = (float)LINES * 80/100;
 	width = height*2;
 	starty = (LINES - height) / 2;
 	startx = (COLS - width) / 2;
 
-
 	refresh();
-    my_win = create_newwin(height, width, starty, startx);
+    game_box = create_newwin(height, width, starty, startx);
 
-    char** matrix = create_matrix(height, 50);
+    matrix = create_matrix(height, 50);
     draw_matrix(matrix, height, startx+1, starty);
-    mvprintw(starty-1, startx+(height)-10, "Press Enter to start!");
-    mvgetch(0, 0);
-    mvprintw(starty-1, startx+(height)-10, "                     ");
-    int gen = 0;
+    while(1){
+        mvprintw(starty-1, startx+(height)-27, "Press Enter to continuously or Space to run gen by gen!");
+        opt = getch();
+        mvprintw(starty-1, startx+(height)-27, "                                                       ");
+        if(opt == ' ' || opt == '\n'){
+            if(opt == ' ')
+                mvprintw(starty+height, startx+(height)-23, "Keep pressing Space to step through generations");
+            break;
+        }
+    }
+
     while(true){
         matrix = next_move(matrix, height);
         mvprintw(starty-1, startx+(height)-7, "Generation: %d", gen++);
         draw_matrix(matrix, height, startx+1, starty);
         refresh();
-        if(0)
-            mvgetch(0, 0);
-        else
-            delay_output(50);
+        if(opt == ' ')mvgetch(0, 0);
+        else delay_output(50);
     }
+
     destroy_matrix(matrix, height);
     getch();
-
 	endwin();
 	return 0;
 }
 
-WINDOW *create_newwin(int height, int width, int starty, int startx){
-   WINDOW *local_win;
-   
-   local_win = newwin(height, width, starty, startx);
-   box(local_win, 0 , 0);
-   wrefresh(local_win);
-   
-   return local_win;
-}
-
-void destroy_win(WINDOW *local_win){	
-    wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
-    wrefresh(local_win);
-    delwin(local_win);
-}
