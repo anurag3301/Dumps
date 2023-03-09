@@ -104,15 +104,19 @@ int main(int argc, char *argv[]){
 
     char** matrix = create_matrix(height, 50);
     draw_matrix(matrix, height, startx+1, starty);
+    mvprintw(starty-1, startx+(height)-10, "Press Enter to start!");
     mvgetch(0, 0);
+    mvprintw(starty-1, startx+(height)-10, "                     ");
     int gen = 0;
     while(true){
         matrix = next_move(matrix, height);
         mvprintw(starty-1, startx+(height)-7, "Generation: %d", gen++);
         draw_matrix(matrix, height, startx+1, starty);
         refresh();
-        mvgetch(0, 0);
-        /* delay_output(50); */
+        if(0)
+            mvgetch(0, 0);
+        else
+            delay_output(50);
     }
     destroy_matrix(matrix, height);
     getch();
