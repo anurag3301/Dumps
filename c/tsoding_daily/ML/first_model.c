@@ -16,11 +16,11 @@ float rand_float(void){
     return (float)rand()/(float)RAND_MAX;
 }
 
-float cost(float w){
+float cost(float w, float b){
     float result = 0.0f;
     for(size_t i = 0; i<train_count; i++){
         float x = train[i][0];
-        float y = x*w;
+        float y = x*w + b;
         float d = y - train[i][1];
         result += d*d;
     }
@@ -35,20 +35,24 @@ int main(){
     srand(time(0));
 
     float w = rand_float()*10.0f;
+    float b = rand_float()*5.0f;
 
     float eps = 1e-3;
     float rate = 1e-3;
 
-    printf("%f\n", cost(w));
+    printf("%f\n", cost(w, b));
     
-    for(size_t i=0; i<500; i++){
-        float dcost = (cost(w + eps) - cost(w))/eps;
-        w-= dcost*rate;
-        printf("cost = %f, w = %f\n", cost(w), w);
+    for(size_t i=0; i<10000; i++){
+        float c = cost(w, b);
+        float dw = (cost(w + eps, b) - c)/eps;
+        float db = (cost(w, b + eps) - c)/eps;
+        w -= dw*rate;
+        b -= db*rate;
+        printf("cost = %f, w = %f, b = %f\n", cost(w, b), w, b);
     }
 
     printf("------------------------------------\n");
-    printf("final w: %f\n", w);
+    printf("final w: %f, b: %f\n", w, b);
 
     return 0;
 }
