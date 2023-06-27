@@ -16,7 +16,7 @@ _start:
 ; input: rax as pointer to string
 ; output: print string at rax
 _print:
-    push rax
+    push rax        ; Push 
     mov rbx, 0
 
 _printLoop:
