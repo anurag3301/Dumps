@@ -3,8 +3,10 @@
 #include "csv.h"
 
 int main(){
-    Table* table = init_table("username.csv");
+    Table* table = init_table("iris_full.csv");
+    /* Table* table = init_table("copy.csv"); */
     
     print_table(table);
+
     distroy_table(table);
 }

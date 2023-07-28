@@ -14,9 +14,17 @@ static size_t max_size_t(size_t a, size_t b){
 static void print_pad(char* str, size_t width){
     size_t length = strlen(str);
     size_t space_count = (length<width)?(width-length):0;
-    printf("%s", str);
-    printf(", ");
+    printf("%s, ", str);
     while(space_count--)printf(" ");
+}
+
+static void dos2unix(char *line){
+    size_t length = strlen(line); 
+
+    if(line[length-2] == '\r'){
+        line[length-2] = '\n';
+        line[length-1] = '\0';
+    }
 }
 
 char* substr(char* raw_str, size_t idx, size_t len){
@@ -77,6 +85,7 @@ Table* init_table(char* file_name){
     // Read first line againg and initialise the col names
     rewind(f);
     getline(&line, &len, f);
+    dos2unix(line);
     char** col_names = parse_row(line, table->col_count);
     table->col_names = col_names;
     for(int i=0; i<table->col_count; i++){
@@ -89,6 +98,7 @@ Table* init_table(char* file_name){
     rewind(f);
     getline(&line, &len, f);
     for(size_t line_no=0; getline(&line, &len, f) != -1; line_no++){
+        dos2unix(line);
         char** res = parse_row(line, table->col_count);
         for(size_t i=0; i<table->col_count; i++){
             table->cols[i].colvals[line_no] = res[i];
@@ -211,7 +221,6 @@ void print_table(Table* table){
     for(size_t row=0; row<table->row_count; row++){
         printf("\n");
         for(size_t col=0; col<table->col_count; col++){
-            /* printf("%s, ", table->cols[col].colvals[row]); */
             print_pad(table->cols[col].colvals[row], table->col_width[col]);
         }
     }
