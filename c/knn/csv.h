@@ -13,6 +13,7 @@ typedef struct Table{
     size_t row_count;
     size_t col_count;
     size_t max_size;
+    size_t* col_width;
 }Table;
 
 typedef struct Row{

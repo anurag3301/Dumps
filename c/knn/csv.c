@@ -4,6 +4,21 @@
 #include <math.h>
 #include "csv.h"
 
+static size_t max_size_t(size_t a, size_t b){
+    if(a>b){
+        return a;
+    }
+    return b;
+}
+
+static void print_pad(char* str, size_t width){
+    size_t length = strlen(str);
+    size_t space_count = (length<width)?(width-length):0;
+    printf("%s", str);
+    printf(", ");
+    while(space_count--)printf(" ");
+}
+
 char* substr(char* raw_str, size_t idx, size_t len){
     char* result = malloc(sizeof(char)*(len+1));
     int i, j;
@@ -27,6 +42,7 @@ char** parse_row(char* line, size_t col_num){
 }
 
 Table* init_table(char* file_name){
+    // Open file and check if its valid
     FILE *f = fopen(file_name, "r");
     char *line = NULL;
     size_t len = 0;
@@ -38,12 +54,16 @@ Table* init_table(char* file_name){
 
     Table* table = malloc(sizeof(Table));
 
+    // Read first line and figure out number of cols
     getline(&line, &len, f);
     size_t comma_count = 0;
     for(int i=0; line[i]!='\0'; i++)if(line[i]==',')comma_count++;
     table->col_count = ++comma_count;
     table->cols = malloc(sizeof(Column) * table->col_count);
+    table->col_width = calloc(table->col_count, sizeof(size_t));
 
+
+    // Go through the file to figureout number of lines ie. number of rows
     rewind(f);
     size_t line_count = 0;
     while(getline(&line, &len, f) != -1)line_count++;
@@ -54,21 +74,25 @@ Table* init_table(char* file_name){
         table->cols[i].row_count = table->row_count;
     }
     
+    // Read first line againg and initialise the col names
     rewind(f);
     getline(&line, &len, f);
     char** col_names = parse_row(line, table->col_count);
     table->col_names = col_names;
     for(int i=0; i<table->col_count; i++){
         table->cols[i].colname = table->col_names[i];
+        table->col_width[i] = max_size_t(table->col_width[i], strlen(table->col_names[i]));
     }
 
 
+    // read each line, parse it and create the entire table
     rewind(f);
     getline(&line, &len, f);
     for(size_t line_no=0; getline(&line, &len, f) != -1; line_no++){
         char** res = parse_row(line, table->col_count);
         for(size_t i=0; i<table->col_count; i++){
             table->cols[i].colvals[line_no] = res[i];
+            table->col_width[i] = max_size_t(table->col_width[i], strlen(res[i]));
         }
         free(res);
     }
@@ -91,6 +115,7 @@ void distroy_table(Table* table){
     }
     free(table->col_names);
     free(table->cols);
+    free(table->col_width);
 
     free(table);
 }
@@ -181,12 +206,13 @@ char* const get_row_val(Row* row, char* col_name, int to_free){
 void print_table(Table* table){
     printf("\nNumber of rows: %zu and Number of cols: %zu\n\n", table->row_count, table->col_count);
     for(size_t i=0; i<table->col_count; i++){
-        printf("%s,\t", table->col_names[i]);
+        print_pad(table->col_names[i], table->col_width[i]);
     }
     for(size_t row=0; row<table->row_count; row++){
         printf("\n");
         for(size_t col=0; col<table->col_count; col++){
-            printf("%s,\t", table->cols[col].colvals[row]);
+            /* printf("%s, ", table->cols[col].colvals[row]); */
+            print_pad(table->cols[col].colvals[row], table->col_width[col]);
         }
     }
     printf("\n");
@@ -201,9 +227,11 @@ Table* copy_table(Table* table){
     new->cols = malloc(sizeof(Column) * new->col_count);
 
     new->col_names = malloc(sizeof(char*) * new->col_count);
+    new->col_width = malloc(sizeof(size_t) * new->col_count);
     for(size_t i=0; i<new->col_count; i++){
         new->cols[i].row_count = new->row_count;
         new->cols[i].max_size = new->max_size;
+        new->col_width[i] = table->col_width[i];
 
         new->col_names[i] = strdup(table->col_names[i]);
         new->cols[i].colname = new->col_names[i];
