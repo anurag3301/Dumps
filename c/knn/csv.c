@@ -28,6 +28,8 @@ static void dos2unix(char *line){
 }
 
 char* substr(char* raw_str, size_t idx, size_t len){
+    for(; raw_str[idx]==' '; idx++,len--);
+    for(; raw_str[idx+len-1]==' '; len--);
     char* result = malloc(sizeof(char)*(len+1));
     int i, j;
     for(i=idx, j=0; i<=(len+idx-1) && raw_str[i]!='\0'; i++, j++){
