@@ -21,15 +21,37 @@ void init_shuffel(Table *main, Table *toshuffel){
     free(idx_arr);
 }
 
+void horizontal_split(Table *master, Table **train, Table **test, uint ratio){
+    *train = init_table("headers.csv");
+    *test = init_table("headers.csv");
+    for(size_t i=0; i<master->row_count*ratio/100; i++){
+        Row *cur_row = get_row(i, master);
+        add_row(cur_row->row_vals, *train);
+        distroy_row(cur_row);
+    }
+
+    for(size_t i=master->row_count*ratio/100; i<master->row_count; i++){
+        Row *cur_row = get_row(i, master);
+        add_row(cur_row->row_vals, *test);
+        distroy_row(cur_row);
+    }
+}
+
 
 int main(){
     Table* table = init_table("iris.csv");
     Table* shuffeled = init_table("headers.csv");
+    Table *train=NULL, *test=NULL;
     
-    print_table(table);
     init_shuffel(table, shuffeled);
-    print_table(shuffeled);
+    horizontal_split(shuffeled, &train, &test, 50);
 
+    print_table(shuffeled);
+    print_table(train);
+    print_table(test);
+
+    distroy_table(train);
+    distroy_table(test);
     distroy_table(table);
     distroy_table(shuffeled);
 }
