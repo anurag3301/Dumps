@@ -119,6 +119,10 @@ Table* init_table(char* file_name){
 }
 
 void distroy_table(Table* table){
+    if(table == NULL){
+        return;
+    }  
+
     for(size_t row=0; row<table->row_count; row++){
         for(size_t col=0; col<table->col_count; col++){
             free(table->cols[col].colvals[row]);
