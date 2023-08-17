@@ -21,6 +21,15 @@ void init_shuffel(Table *main, Table *toshuffel){
     free(idx_arr);
 }
 
+typedef struct Distance{
+    char *label;
+    float distance;
+}Distance;
+
+void predict(Table train, float sl, float sw, float pl, float pw, int k){
+    Distance *dis = malloc(sizeof(Distance) * train.row_count);
+}
+
 void horizontal_split(Table *master, Table **train, Table **test, uint ratio){
     *train = init_table("headers.csv");
     *test = init_table("headers.csv");
@@ -39,7 +48,7 @@ void horizontal_split(Table *master, Table **train, Table **test, uint ratio){
 
 
 int main(){
-    Table* table = init_table("iris.csv");
+    Table* table = init_table("iris_full.csv");
     Table* shuffeled = init_table("headers.csv");
     Table *train=NULL, *test=NULL;
     
@@ -50,8 +59,8 @@ int main(){
     print_table(train);
     print_table(test);
 
-    distroy_table(train);
-    distroy_table(test);
-    distroy_table(table);
-    distroy_table(shuffeled);
+    /* distroy_table(train); */
+    /* distroy_table(test); */
+    /* distroy_table(table); */
+    /* distroy_table(shuffeled); */
 }
