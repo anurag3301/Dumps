@@ -5,6 +5,8 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
+#include <float.h>
 
 #define SCREEN_RADIUS 5
 #define MEAN_RADIUS (SCREEN_RADIUS*2)
@@ -67,37 +69,71 @@ Color colours[] = {GOLD, PINK, MAROON, GREEN,
 static int colour_count = sizeof(colours)/sizeof(Color);
 static Samples cluster[K] = {0};
 static Vector2 means[K] = {0};
+static Samples set = {0};
+
+
+static void generate_new_state(void){
+    set.count = 0;
+    generate_cluster(CLITERAL(Vector2){0}, 10, 100, &set);
+    generate_cluster(CLITERAL(Vector2){MIN_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+    generate_cluster(CLITERAL(Vector2){MAX_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+    for(size_t i=0; i<K; i++){
+        means[i].x = Lerp(MIN_X, MAX_X, rand_float());
+        means[i].y = Lerp(MIN_Y, MAX_Y, rand_float());
+    }
+}
+
+static void recluster_state(void){
+    for(size_t j=0; j<K; j++){
+        cluster[j].count = 0;
+    }
+
+    for(size_t i = 0; i<set.count; i++){
+        Vector2 p = set.items[i];
+        int k = -1;
+        float s = FLT_MAX;
+        for(size_t j=0; j<K; j++){
+            Vector2 m = means[j];
+            float sm = Vector2LengthSqr(Vector2Subtract(p, m));
+            if(sm < s){
+                s = sm;
+                k = j;
+            }
+        }
+
+        if(cluster[k].count == cluster[k].capacity){
+            resize(&cluster[k]);
+        }
+        cluster[k].items[cluster[k].count++] = p;
+    }
+}
 
 int main(){
     /* SetConfigFlags(FLAG_WINDOW_RESIZABLE); */
 
     InitWindow(800, 600, "K-Means");
-    Samples set = {0};
-    generate_cluster(CLITERAL(Vector2){0}, 10, 100, &set);
-    generate_cluster(CLITERAL(Vector2){MIN_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
-    generate_cluster(CLITERAL(Vector2){MAX_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
 
+    generate_new_state();
+    recluster_state();
 
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_R)){
-            set.count = 0;
-            generate_cluster(CLITERAL(Vector2){0}, 10, 100, &set);
-            generate_cluster(CLITERAL(Vector2){MIN_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
-            generate_cluster(CLITERAL(Vector2){MAX_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
-            for(size_t i=0; i<K; i++){
-                means[i].x = Lerp(MIN_X, MAX_X, rand_float());
-                means[i].y = Lerp(MIN_Y, MAX_Y, rand_float());
-            }
+            generate_new_state();
+            recluster_state();
         }
         BeginDrawing();
         ClearBackground(GetColor(0x181818AA));
         for(size_t i=0; i<set.count; i++){
             Vector2 it = set.items[i];
-            DrawCircleV(project_sample_to_screen(it), SCREEN_RADIUS, RED);
+            DrawCircleV(project_sample_to_screen(it), SCREEN_RADIUS, WHITE);
         }
         for(size_t i=0; i<K; i++){
-            Vector2 it = means[i];
-            DrawCircleV(project_sample_to_screen(it), MEAN_RADIUS, colours[i%colour_count]);
+            Color colour = colours[i%colour_count];
+            for(size_t j=0; j<cluster[i].count; j++){
+                Vector2 it = cluster[i].items[j];
+                DrawCircleV(project_sample_to_screen(it), SCREEN_RADIUS, colour);
+            }
+            DrawCircleV(project_sample_to_screen(means[i]), MEAN_RADIUS, colour);
         }
         EndDrawing();
     }
