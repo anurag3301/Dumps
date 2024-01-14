@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <raylib.h>
+#include <raymath.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
+#define SCREEN_RADIUS 5
+#define MEAN_RADIUS (SCREEN_RADIUS*2)
 #define MIN_X -20.0
 #define MAX_X 20.0
 #define MIN_Y -20.0
 #define MAX_Y 20.0
+#define K 3
 
-Vector2 project_sample_to_screen(Vector2 sample){
+static Vector2 project_sample_to_screen(Vector2 sample){
     
     float w = GetScreenWidth();
     float h = GetScreenHeight();
@@ -25,11 +30,11 @@ typedef struct{
     size_t capacity;
 } Samples;
 
-float rand_float(){
+static float rand_float(){
     return (float)rand()/RAND_MAX;
 }
 
-void resize(Samples *samples){
+static void resize(Samples *samples){
     if(samples->capacity == 0){
         samples->capacity = 4;
         samples->items = malloc(sizeof(Vector2) * samples->capacity);
@@ -42,7 +47,7 @@ void resize(Samples *samples){
     samples->items = new_items;
 }
 
-void generate_cluster(Vector2 center, float radius, size_t count, Samples *samples){
+static void generate_cluster(Vector2 center, float radius, size_t count, Samples *samples){
     for(size_t i=0; i<count; i++){
         float angle = rand_float()*2*PI; 
         float mag = rand_float();
@@ -57,22 +62,43 @@ void generate_cluster(Vector2 center, float radius, size_t count, Samples *sampl
     }
 }
 
+static Samples cluster[K] = {0};
+static Vector2 means[K] = {0};
+
 int main(){
     /* SetConfigFlags(FLAG_WINDOW_RESIZABLE); */
 
     InitWindow(800, 600, "K-Means");
-    Samples cluster = {0};
-    generate_cluster(CLITERAL(Vector2){0}, 10, 100, &cluster);
+    Samples set = {0};
+    generate_cluster(CLITERAL(Vector2){0}, 10, 100, &set);
+    generate_cluster(CLITERAL(Vector2){MIN_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+    generate_cluster(CLITERAL(Vector2){MAX_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+
+
     while(!WindowShouldClose()){
+        if(IsKeyPressed(KEY_R)){
+            set.count = 0;
+            generate_cluster(CLITERAL(Vector2){0}, 10, 100, &set);
+            generate_cluster(CLITERAL(Vector2){MIN_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+            generate_cluster(CLITERAL(Vector2){MAX_X*0.5f, MAX_Y*0.5f}, 5, 50, &set);
+            for(size_t i=0; i<K; i++){
+                means[i].x = Lerp(MIN_X, MAX_X, rand_float());
+                means[i].y = Lerp(MIN_Y, MAX_Y, rand_float());
+            }
+        }
         BeginDrawing();
         ClearBackground(GetColor(0x181818AA));
-        for(size_t i=0; i<cluster.count; i++){
-            Vector2 it = cluster.items[i];
-            DrawCircleV(project_sample_to_screen(it), 10, RED);
+        for(size_t i=0; i<set.count; i++){
+            Vector2 it = set.items[i];
+            DrawCircleV(project_sample_to_screen(it), SCREEN_RADIUS, RED);
+        }
+        for(size_t i=0; i<K; i++){
+            Vector2 it = means[i];
+            DrawCircleV(project_sample_to_screen(it), MEAN_RADIUS, YELLOW);
         }
         EndDrawing();
     }
-    free(cluster.items);
+    free(set.items);
     CloseWindow();
     return 0;
 }
