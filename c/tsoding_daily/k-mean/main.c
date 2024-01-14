@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <assert.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
@@ -108,6 +109,23 @@ static void recluster_state(void){
     }
 }
 
+void update_means(void){
+    for(size_t i=0; i<K; i++){
+        if(cluster[i].count > 0){
+            assert(cluster[i].count > 0);
+            means[i] = Vector2Zero();
+            for(size_t j=0; j<cluster[i].count; j++){
+                means[i] = Vector2Add(means[i], cluster[i].items[j]);
+            }
+            means[i].x /= cluster[i].count;
+            means[i].y /= cluster[i].count;
+        }else{
+            means[i].x = Lerp(MIN_X, MAX_X, rand_float());
+            means[i].y = Lerp(MIN_Y, MAX_Y, rand_float());
+        }
+    }
+}
+
 int main(){
     /* SetConfigFlags(FLAG_WINDOW_RESIZABLE); */
 
@@ -119,6 +137,10 @@ int main(){
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_R)){
             generate_new_state();
+            recluster_state();
+        }
+        if(IsKeyPressed(KEY_SPACE)){
+            update_means();
             recluster_state();
         }
         BeginDrawing();
