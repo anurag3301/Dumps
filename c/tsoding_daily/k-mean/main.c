@@ -15,7 +15,7 @@
 #define K 3
 
 static Vector2 project_sample_to_screen(Vector2 sample){
-    
+
     float w = GetScreenWidth();
     float h = GetScreenHeight();
     return CLITERAL(Vector2){
@@ -49,7 +49,7 @@ static void resize(Samples *samples){
 
 static void generate_cluster(Vector2 center, float radius, size_t count, Samples *samples){
     for(size_t i=0; i<count; i++){
-        float angle = rand_float()*2*PI; 
+        float angle = rand_float()*2*PI;
         float mag = rand_float();
         Vector2 sample = {
             .x = center.x + cosf(angle)*mag*radius,
@@ -57,11 +57,14 @@ static void generate_cluster(Vector2 center, float radius, size_t count, Samples
         };
         if(samples->count == samples->capacity){
             resize(samples);
-        } 
+        }
         samples->items[samples->count++] = sample;
     }
 }
 
+Color colours[] = {GOLD, PINK, MAROON, GREEN, 
+                 SKYBLUE, PURPLE, VIOLET, BEIGE, BROWN};
+static int colour_count = sizeof(colours)/sizeof(Color);
 static Samples cluster[K] = {0};
 static Vector2 means[K] = {0};
 
@@ -94,7 +97,7 @@ int main(){
         }
         for(size_t i=0; i<K; i++){
             Vector2 it = means[i];
-            DrawCircleV(project_sample_to_screen(it), MEAN_RADIUS, YELLOW);
+            DrawCircleV(project_sample_to_screen(it), MEAN_RADIUS, colours[i%colour_count]);
         }
         EndDrawing();
     }
